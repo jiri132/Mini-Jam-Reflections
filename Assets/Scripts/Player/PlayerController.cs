@@ -159,7 +159,6 @@ public class PlayerController : MonoBehaviour
         {
             // Set horizontal move speed
             _currentHorizontalSpeed += movementManager.Direction().x * _acceleration * Time.deltaTime;
-            Debug.Log(_currentHorizontalSpeed);
             // clamped by max frame movement
             _currentHorizontalSpeed = Mathf.Clamp(_currentHorizontalSpeed, -_moveClamp, _moveClamp);
         }
