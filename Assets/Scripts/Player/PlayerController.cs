@@ -54,6 +54,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("COLLISION")] [SerializeField] private Bounds _characterBounds;
     [SerializeField] private int _detectorCount = 3;
+    [SerializeField] private LayerMask _collisionObjects;
     [SerializeField] private float _detectionRayLength = 0.1f;
     [SerializeField] [Range(0.1f, 0.3f)] private float _rayBuffer = 0.1f; // Prevents side detectors hitting the ground
 
@@ -72,7 +73,7 @@ public class PlayerController : MonoBehaviour
 
         bool RunDetection(RayRange range)
         {
-            return EvaluateRayPositions(range).Any(point => Physics2D.Raycast(point, range.Dir, _detectionRayLength));
+            return EvaluateRayPositions(range).Any(point => Physics2D.Raycast(point, range.Dir, _detectionRayLength, _collisionObjects));
         }
 
     }
@@ -205,7 +206,7 @@ public class PlayerController : MonoBehaviour
         var furthestPoint = pos + move;
 
         // check furthest movement. If nothing hit, move and don't do extra checks
-        var hit = Physics2D.OverlapBox(furthestPoint, _characterBounds.size, 0);
+        var hit = Physics2D.OverlapBox(furthestPoint, _characterBounds.size, 0, _collisionObjects);
         if (!hit)
         {
             transform.position += move;
@@ -220,6 +221,7 @@ public class PlayerController : MonoBehaviour
             var t = (float)i / _freeColliderIterations;
             var posToTry = Vector2.Lerp(pos, furthestPoint, t);
 
+            //disabled nudging
             /*if (Physics2D.OverlapBox(posToTry, _characterBounds.size, 0))
             {
                 transform.position = positionToMoveTo;
@@ -234,7 +236,7 @@ public class PlayerController : MonoBehaviour
 
                 return;
             }
-*/
+            */
             positionToMoveTo = posToTry;
         }
     }
