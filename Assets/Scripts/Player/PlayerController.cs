@@ -5,28 +5,21 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-
     private enum movementType { Undefined,Keyboard, Controller }
 
     [Header("Movement")]
     [SerializeField]private movementType _movementType = movementType.Undefined;
     public MovementManager movementManager;
     public Vector3 RawMovement { get; private set; }
+    public bool inverted = false;
     public float _currentHorizontalSpeed, _currentVerticalSpeed; 
 
 
     [Header("Player Activities")]
     private bool _active;
 
-
     private void Awake() => Invoke(nameof(Activate), 0.5f);
     void Activate() => _active = true;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
     void Update()
@@ -150,10 +143,13 @@ public class PlayerController : MonoBehaviour
         //Debug.Log(movementManager.Direction().x);
         if (movementManager.Direction().x != 0)
         {
+            if (inverted) { _currentHorizontalSpeed += movementManager.Direction().x * _acceleration * Time.deltaTime * -1; }
+            else { _currentHorizontalSpeed += movementManager.Direction().x * _acceleration * Time.deltaTime; }
             // Set horizontal move speed
-            _currentHorizontalSpeed += movementManager.Direction().x * _acceleration * Time.deltaTime;
+            
             // clamped by max frame movement
             _currentHorizontalSpeed = Mathf.Clamp(_currentHorizontalSpeed, -_moveClamp, _moveClamp);
+            
         }
         else
         {
@@ -172,10 +168,12 @@ public class PlayerController : MonoBehaviour
         if (movementManager.Direction().y != 0)
         {
             // Set horizontal move speed
-            _currentVerticalSpeed += movementManager.Direction().y * _acceleration * Time.deltaTime;
+            if (inverted) { _currentVerticalSpeed += movementManager.Direction().y * _acceleration * Time.deltaTime * -1; }
+            else { _currentVerticalSpeed += movementManager.Direction().y * _acceleration * Time.deltaTime; }
 
             // clamped by max frame movement
             _currentVerticalSpeed = Mathf.Clamp(_currentVerticalSpeed, -_moveClamp, _moveClamp);
+
         }
         else
         {
@@ -222,21 +220,21 @@ public class PlayerController : MonoBehaviour
             var t = (float)i / _freeColliderIterations;
             var posToTry = Vector2.Lerp(pos, furthestPoint, t);
 
-            if (Physics2D.OverlapBox(posToTry, _characterBounds.size, 0))
+            /*if (Physics2D.OverlapBox(posToTry, _characterBounds.size, 0))
             {
                 transform.position = positionToMoveTo;
 
                 // We've landed on a corner or hit our head on a ledge. Nudge the player gently
                 if (i == 1)
                 {
-                    if (_currentVerticalSpeed < 0) _currentVerticalSpeed = 0;
+                    //if (_currentVerticalSpeed < 0) _currentVerticalSpeed = 0;
                     var dir = transform.position - hit.transform.position;
                     transform.position += dir.normalized * move.magnitude;
                 }
 
                 return;
             }
-
+*/
             positionToMoveTo = posToTry;
         }
     }
