@@ -31,12 +31,12 @@ public class PlayerController : MonoBehaviour
 
     public void GetMovementType()
     {
-        if (Input.anyKey)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             _movementType = movementType.Keyboard;
             movementManager = new KeyboardControls();
         }
-        if (Input.GetAxis("Horizontal") > 0 || Input.GetAxis("Horizontal") < 0)
+        else if (Input.GetButton("Submit"))
         {
             _movementType = movementType.Controller;
             movementManager = new ControllerControls();
