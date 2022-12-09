@@ -14,7 +14,7 @@ public abstract class MovementManager
     /// <summary>
     /// Is the player on the ground?
     /// </summary>
-    /// <returns>returns ture if it is on the ground</returns>
+    /// <returns>returns true if its on the ground </returns>
     public abstract bool OnGround();
 
     /// <summary>
