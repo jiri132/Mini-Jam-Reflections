@@ -12,9 +12,4 @@ public class KeyboardControls : MovementManager
             right = Input.GetKey(KeyCode.D) ? 1 : 0;
         return new Vector2(left + right, up + down);
     }
-
-    public override bool OnGround()
-    {
-        throw new System.NotImplementedException();
-    }
 }

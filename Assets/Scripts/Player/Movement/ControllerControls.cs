@@ -11,9 +11,4 @@ public class ControllerControls : MovementManager
 
         return new Vector2(x, y);
     }
-
-    public override bool OnGround()
-    {
-        throw new System.NotImplementedException();
-    }
 }

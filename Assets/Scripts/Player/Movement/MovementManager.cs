@@ -12,12 +12,6 @@ public abstract class MovementManager
     public abstract Vector2 Direction();
 
     /// <summary>
-    /// Is the player on the ground?
-    /// </summary>
-    /// <returns>returns true if its on the ground </returns>
-    public abstract bool OnGround();
-
-    /// <summary>
     /// Speed of the player
     /// </summary>
     public float Speed = 10f;
