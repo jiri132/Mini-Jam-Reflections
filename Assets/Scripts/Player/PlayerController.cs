@@ -31,27 +31,20 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!_active) { return; }
+
         if (_movementType == movementType.Undefined) {
             GetMovementType(); 
             return; 
         }
 
-
         RunCollisionChecks(); // Collision Detection
-
         CalculateWalk(); // Horizontal & Vertical movement
-       
-
         MoveCharacter(); // Actually preforms the movement
-        //transform.position += (Vector3)movementManager.Direction() * movementManager.Speed * Time.deltaTime;
     }
-
-
 
     public void GetMovementType()
     {
-          
-
         if (Input.GetKeyDown(KeyCode.Space))
         {
             _movementType = movementType.Keyboard;
