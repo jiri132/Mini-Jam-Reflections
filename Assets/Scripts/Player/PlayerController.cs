@@ -8,9 +8,10 @@ public class PlayerController : MonoBehaviour
 
     private enum movementType { Undefined,Keyboard, Controller }
 
-    [Header("Movmeent")]
+    [Header("Movement")]
     [SerializeField]private movementType _movementType = movementType.Undefined;
     public MovementManager movementManager;
+    public Vector3 RawMovement { get; private set; }
     public float _currentHorizontalSpeed, _currentVerticalSpeed; 
 
 
@@ -30,18 +31,26 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        GetMovementType();
+        if (_movementType == movementType.Undefined) {
+            GetMovementType(); 
+            return; 
+        }
+
+
+        RunCollisionChecks(); // Collision Detection
+
+        CalculateWalk(); // Horizontal & Vertical movement
        
 
-        transform.position += (Vector3)movementManager.Direction() * movementManager.Speed * Time.deltaTime;
+        MoveCharacter(); // Actually preforms the movement
+        //transform.position += (Vector3)movementManager.Direction() * movementManager.Speed * Time.deltaTime;
     }
 
 
 
     public void GetMovementType()
     {
-        if (_movementType != movementType.Undefined) { return; }
-            
+          
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -58,7 +67,6 @@ public class PlayerController : MonoBehaviour
     #region Collisions
 
     [Header("COLLISION")] [SerializeField] private Bounds _characterBounds;
-    [SerializeField] private LayerMask _groundLayer;
     [SerializeField] private int _detectorCount = 3;
     [SerializeField] private float _detectionRayLength = 0.1f;
     [SerializeField] [Range(0.1f, 0.3f)] private float _rayBuffer = 0.1f; // Prevents side detectors hitting the ground
@@ -66,7 +74,7 @@ public class PlayerController : MonoBehaviour
     private RayRange _raysUp, _raysRight, _raysDown, _raysLeft;
     private bool _colUp, _colRight, _colDown, _colLeft;
 
-    private void CollisionChecks()
+    private void RunCollisionChecks()
     {
         //generates ray range
         CalculateRayRanged();
@@ -78,7 +86,7 @@ public class PlayerController : MonoBehaviour
 
         bool RunDetection(RayRange range)
         {
-            return EvaluateRayPositions(range).Any(point => Physics2D.Raycast(point, range.Dir, _detectionRayLength, _groundLayer));
+            return EvaluateRayPositions(range).Any(point => Physics2D.Raycast(point, range.Dir, _detectionRayLength));
         }
 
     }
@@ -132,4 +140,114 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region Walk
+
+    [Header("WALKING")] [SerializeField] private float _acceleration = 90;
+    [SerializeField] private float _moveClamp = 13;
+    [SerializeField] private float _deAcceleration = 60f;
+
+    private void CalculateWalk()
+    {
+        CalculateWalkHorizontal();
+        CalculateWalkVertical();
+    }
+
+    void CalculateWalkHorizontal()
+    {
+        //Debug.Log(movementManager.Direction().x);
+        if (movementManager.Direction().x != 0)
+        {
+            // Set horizontal move speed
+            _currentHorizontalSpeed += movementManager.Direction().x * _acceleration * Time.deltaTime;
+            Debug.Log(_currentHorizontalSpeed);
+            // clamped by max frame movement
+            _currentHorizontalSpeed = Mathf.Clamp(_currentHorizontalSpeed, -_moveClamp, _moveClamp);
+        }
+        else
+        {
+            // No input. Let's slow the character down
+            _currentHorizontalSpeed = Mathf.MoveTowards(_currentHorizontalSpeed, 0, _deAcceleration * Time.deltaTime);
+        }
+
+        if (_currentHorizontalSpeed > 0 && _colRight || _currentHorizontalSpeed < 0 && _colLeft)
+        {
+            // Don't walk through walls
+            _currentHorizontalSpeed = 0;
+        }
+    }
+    void CalculateWalkVertical()
+    {
+        if (movementManager.Direction().y != 0)
+        {
+            // Set horizontal move speed
+            _currentVerticalSpeed += movementManager.Direction().y * _acceleration * Time.deltaTime;
+
+            // clamped by max frame movement
+            _currentVerticalSpeed = Mathf.Clamp(_currentVerticalSpeed, -_moveClamp, _moveClamp);
+        }
+        else
+        {
+            // No input. Let's slow the character down
+            _currentVerticalSpeed = Mathf.MoveTowards(_currentVerticalSpeed, 0, _deAcceleration * Time.deltaTime);
+        }
+
+        if (_currentVerticalSpeed > 0 && _colRight || _currentVerticalSpeed < 0 && _colLeft)
+        {
+            // Don't walk through walls
+            _currentVerticalSpeed = 0;
+        }
+    }
+
+    #endregion
+
+    #region Move
+
+    [Header("MOVE")]
+    [SerializeField, Tooltip("Raising this value increases collision accuracy at the cost of performance.")]
+    private int _freeColliderIterations = 10;
+
+    // We cast our bounds before moving to avoid future collisions
+    private void MoveCharacter()
+    {
+        var pos = transform.position + _characterBounds.center;
+        RawMovement = new Vector3(_currentHorizontalSpeed, _currentVerticalSpeed); // Used externally
+        var move = RawMovement * Time.deltaTime;
+        var furthestPoint = pos + move;
+
+        // check furthest movement. If nothing hit, move and don't do extra checks
+        var hit = Physics2D.OverlapBox(furthestPoint, _characterBounds.size, 0);
+        if (!hit)
+        {
+            transform.position += move;
+            return;
+        }
+
+        // otherwise increment away from current pos; see what closest position we can move to
+        var positionToMoveTo = transform.position;
+        for (int i = 1; i < _freeColliderIterations; i++)
+        {
+            // increment to check all but furthestPoint - we did that already
+            var t = (float)i / _freeColliderIterations;
+            var posToTry = Vector2.Lerp(pos, furthestPoint, t);
+
+            if (Physics2D.OverlapBox(posToTry, _characterBounds.size, 0))
+            {
+                transform.position = positionToMoveTo;
+
+                // We've landed on a corner or hit our head on a ledge. Nudge the player gently
+                if (i == 1)
+                {
+                    if (_currentVerticalSpeed < 0) _currentVerticalSpeed = 0;
+                    var dir = transform.position - hit.transform.position;
+                    transform.position += dir.normalized * move.magnitude;
+                }
+
+                return;
+            }
+
+            positionToMoveTo = posToTry;
+        }
+    }
+
+    #endregion
 }

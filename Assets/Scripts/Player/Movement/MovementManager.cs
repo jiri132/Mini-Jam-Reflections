@@ -10,9 +10,4 @@ public abstract class MovementManager
     /// </summary>
     /// <returns>Gives back the value of direction</returns>
     public abstract Vector2 Direction();
-
-    /// <summary>
-    /// Speed of the player
-    /// </summary>
-    public float Speed = 10f;
 }
