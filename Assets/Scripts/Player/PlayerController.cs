@@ -5,9 +5,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
 
-    public enum movementType { Undefined,Keyboard, Controller }
+    private enum movementType { Undefined,Keyboard, Controller }
 
-    public movementType _movementType = movementType.Undefined;
+    [SerializeField]private movementType _movementType = movementType.Undefined;
     public MovementManager movementManager;
 
 
