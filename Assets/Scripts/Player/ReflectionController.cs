@@ -46,8 +46,6 @@ public class ReflectionController : Player
             TranslatedPosition.y = _player.PlayingField.y + Ratio().y * PlayingField.y;
         }
 
-        Debug.Log(TranslatedPosition);
-
         return TranslatedPosition;
     }
 

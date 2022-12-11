@@ -76,6 +76,10 @@ public abstract class Player : MonoBehaviour
             if (mirror._mirrorDirection == Mirror.mirrorDirection.Horizontal) { rc.reflectionType = ReflectionController.ReflectionType.Vertical; }
             else { rc.reflectionType = ReflectionController.ReflectionType.Horizontal; }
 
+            SpriteRenderer sr = rc.GetComponent<SpriteRenderer>();
+            sr.color = player.GetComponent<SpriteRenderer>().color;
+            sr.color = new Color(sr.color.r * 0.5f, sr.color.g * 0.5f, sr.color.b * 0.5f);
+
             GameManager.Instance._reflections.Add(rc);
         }
     }
