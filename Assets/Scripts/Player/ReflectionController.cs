@@ -8,15 +8,12 @@ public class ReflectionController : Player
 
 
     [Header("MAIN OBJECT")]
-    [SerializeField] private PlayerController _player;
+    [SerializeField] private Player _player;
 
     [Header("COLLISION LAYER")]
     [SerializeField] private LayerMask _LayerWalls;
 
-    [Header("FIELDS")]
-    [SerializeField] private Vector2 _playerField;
-    [SerializeField] private Vector2 _ownField;
-    [SerializeField] private Vector2 _fieldRatio;
+    
 
     public ReflectionType reflectionType;
 
@@ -31,18 +28,7 @@ public class ReflectionController : Player
         //get  the ratio between movement
         _fieldRatio = _ownField / _playerField;
 
-        //basic translation of player position
-        this.transform.position = _player.transform.position;
-
-        //add the movement ratio to the position
-        if (reflectionType == ReflectionType.Horizontal)
-        {
-            this.transform.position = new Vector2(this.transform.position.x * _fieldRatio.x * -1, this.transform.position.y);
-        }
-        else
-        {
-            this.transform.position = new Vector2(this.transform.position.x, this.transform.position.y * _fieldRatio.y * -1);
-        }
+        this.transform.position = TranslatePlayerPosition(_player.transform);
     }
 
 
@@ -50,6 +36,24 @@ public class ReflectionController : Player
     {
         
     }
+    
+    public Vector2 TranslatePlayerPosition(Transform player)
+    {
+        //basic translation of player position
+        Vector2 newPosition = _player.transform.position;
+
+        //add the movement ratio to the position
+        if (reflectionType == ReflectionType.Horizontal) { newPosition.x = this.transform.position.x * _fieldRatio.x * -1;  }
+        else { newPosition.y = this.transform.position.y * _fieldRatio.y * -1; }
+
+        return newPosition;
+    }
+
+    #region Fields
+    [Header("FIELDS")]
+    [SerializeField] private Vector2 _playerField;
+    [SerializeField] private Vector2 _ownField;
+    [SerializeField] private Vector2 _fieldRatio;
 
     private Vector2 GetPlayingField(Transform player)
     {
@@ -58,5 +62,5 @@ public class ReflectionController : Player
 
         return new Vector2(x, y);
     }
-
+    #endregion
 }
