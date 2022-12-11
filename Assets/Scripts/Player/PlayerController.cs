@@ -7,12 +7,17 @@ public class PlayerController : MonoBehaviour
 {
     private enum movementType { Undefined,Keyboard, Controller }
 
-    [Header("Movement")]
-    [SerializeField]private movementType _movementType = movementType.Undefined;
-    public MovementManager movementManager;
+    [Header("ANIMATION")]
+    public Animator _animator;
+
+    [Header("MOVEMENT TYPE")]
+    [SerializeField] private movementType _movementType = movementType.Undefined;
+    [SerializeField] public MovementManager movementManager;
+
+    [Header("MOVEMENT VALUES")]
+    public float _currentHorizontalSpeed;
+    public float _currentVerticalSpeed;
     public Vector3 RawMovement { get; private set; }
-    public bool inverted = false;
-    public float _currentHorizontalSpeed, _currentVerticalSpeed; 
 
 
     [Header("Player Activities")]
@@ -20,6 +25,11 @@ public class PlayerController : MonoBehaviour
 
     private void Awake() => Invoke(nameof(Activate), 0.5f);
     void Activate() => _active = true;
+
+    private void Start()
+    {
+        _animator = GetComponent<Animator>();
+    }
 
     // Update is called once per frame
     void Update()
@@ -34,6 +44,14 @@ public class PlayerController : MonoBehaviour
         RunCollisionChecks(); // Collision Detection
         CalculateWalk(); // Horizontal & Vertical movement
         MoveCharacter(); // Actually preforms the movement
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("VOID"))
+        {
+            _animator.Play(PlayerAnimator.Deathkey);
+        }
     }
 
     public void GetMovementType()
@@ -144,13 +162,11 @@ public class PlayerController : MonoBehaviour
         //Debug.Log(movementManager.Direction().x);
         if (movementManager.Direction().x != 0)
         {
-            if (inverted) { _currentHorizontalSpeed += movementManager.Direction().x * _acceleration * Time.deltaTime * -1; }
-            else { _currentHorizontalSpeed += movementManager.Direction().x * _acceleration * Time.deltaTime; }
+            _currentHorizontalSpeed += movementManager.Direction().x * _acceleration * Time.deltaTime;
             // Set horizontal move speed
             
             // clamped by max frame movement
             _currentHorizontalSpeed = Mathf.Clamp(_currentHorizontalSpeed, -_moveClamp, _moveClamp);
-            
         }
         else
         {
@@ -169,12 +185,10 @@ public class PlayerController : MonoBehaviour
         if (movementManager.Direction().y != 0)
         {
             // Set horizontal move speed
-            if (inverted) { _currentVerticalSpeed += movementManager.Direction().y * _acceleration * Time.deltaTime * -1; }
-            else { _currentVerticalSpeed += movementManager.Direction().y * _acceleration * Time.deltaTime; }
+            _currentVerticalSpeed += movementManager.Direction().y * _acceleration * Time.deltaTime;
 
             // clamped by max frame movement
             _currentVerticalSpeed = Mathf.Clamp(_currentVerticalSpeed, -_moveClamp, _moveClamp);
-
         }
         else
         {
