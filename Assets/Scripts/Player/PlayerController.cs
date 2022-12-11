@@ -7,6 +7,7 @@ public class PlayerController : Player
 {
     private enum movementType { Undefined,Keyboard, Controller }
 
+
     [Header("ANIMATION")]
     public Animator _animator;
 
@@ -29,6 +30,9 @@ public class PlayerController : Player
     private void Start()
     {
         _animator = GetComponent<Animator>();
+        base.PlayingField = GetPlayingField(this.transform);
+        base.GetReflectionMirrors(this);
+
     }
 
     // Update is called once per frame
@@ -67,6 +71,8 @@ public class PlayerController : Player
             movementManager = new ControllerControls();
         }
     }
+
+   
 
     #region Collisions
 

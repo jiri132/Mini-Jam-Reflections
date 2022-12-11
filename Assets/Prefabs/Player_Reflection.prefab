@@ -97,7 +97,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 830b64fd94f10a344a8f4ac311b1cfbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayingField: {x: 0, y: 0}
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 256
   _player: {fileID: 0}
+  _localPosition: {x: 0, y: 0}
+  _mirror: {fileID: 0}
   _LayerWalls:
     serializedVersion: 2
     m_Bits: 256

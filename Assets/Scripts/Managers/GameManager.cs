@@ -6,23 +6,9 @@ using Librarys.Singleton;
 
 public class GameManager : Singleton<GameManager>
 {
-    [SerializeField] private GameObject _reflectionPrefab;
-    [SerializeField] private Mirror[] _mirrors;
+    public GameObject _reflectionPrefab;
+    public List<Mirror> _castedMirrors;
+    public List<Vector2> Fields = new List<Vector2>();
+    public List<ReflectionController> _reflections = new List<ReflectionController>();
 
-    private void Start()
-    {
-        _mirrors = FindObjectsOfType<Mirror>();
-
-        foreach (Mirror mirror in _mirrors)
-        {
-            if (mirror._mirrorDirection == Mirror.mirrorDirection.Horizontal)
-            {
-                Instantiate(_reflectionPrefab).GetComponent<ReflectionController>().reflectionType = ReflectionController.ReflectionType.Vertical;
-            }
-            else
-            {
-                Instantiate(_reflectionPrefab).GetComponent<ReflectionController>().reflectionType = ReflectionController.ReflectionType.Horizontal;
-            }
-        }
-    }  
 }

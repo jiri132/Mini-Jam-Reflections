@@ -8,25 +8,19 @@ public class ReflectionController : Player
 
 
     [Header("MAIN OBJECT")]
-    [SerializeField] private Player _player;
+    [SerializeField] public Player _player;
 
     [Header("COLLISION LAYER")]
     [SerializeField] private LayerMask _LayerWalls;
 
-    
     [Header("REFLECTION SIDE")]
-    public ReflectionType reflectionType;
-
-    private void Awake() => _player = FindObjectOfType<PlayerController>();
+    [SerializeField] public ReflectionType reflectionType;
 
     private void Start()
     {
-        //get the field sizes
-        _playerField = GetPlayingField(_player.transform);
-        _ownField = GetPlayingField(this.transform);
+        this.transform.position = TranslatePlayerPosition(_player.transform);
 
-        //get  the ratio between movement
-        _fieldRatio = _ownField / _playerField;
+        base.GetReflectionMirrors(this);
     }
 
 
@@ -34,31 +28,28 @@ public class ReflectionController : Player
     {
         this.transform.position = TranslatePlayerPosition(_player.transform);
     }
-    
+
     public Vector2 TranslatePlayerPosition(Transform player)
     {
-        //basic translation of player position
-        Vector2 newPosition = _player.transform.position;
+        Vector2 TranslatedPosition = new Vector2();
+        Vector2 Ratio() => (_player.PlayingField - (Vector2)player.position) / _player.PlayingField ;
 
-        //add the movement ratio to the position
-        if (reflectionType == ReflectionType.Horizontal) { newPosition.x = player.position.x * _fieldRatio.x * -1;  }
-        else { newPosition.y = player.position.y * _fieldRatio.y * -1; }
+        //get the correct x and y base of reflection type
+        if (reflectionType == ReflectionType.Horizontal)
+        {
+            TranslatedPosition.x = _player.PlayingField.x + Ratio().x * PlayingField.x - 0.5f;
+            TranslatedPosition.y = player.position.y;
+        }
+        else if (reflectionType == ReflectionType.Vertical)
+        {
+            TranslatedPosition.x = player.position.x;
+            TranslatedPosition.y = _player.PlayingField.y + Ratio().y * PlayingField.y;
+        }
 
-        return newPosition;
+        Debug.Log(TranslatedPosition);
+
+        return TranslatedPosition;
     }
 
-    #region Fields
-    [Header("FIELDS")]
-    [SerializeField] private Vector2 _playerField;
-    [SerializeField] private Vector2 _ownField;
-    [SerializeField] private Vector2 _fieldRatio;
-
-    private Vector2 GetPlayingField(Transform player)
-    {
-        float x = Physics2D.Raycast(player.position, Vector2.up, Mathf.Infinity, _LayerWalls).distance + Physics2D.Raycast(player.position, Vector2.down, Mathf.Infinity, _LayerWalls).distance + player.localScale.x;
-        float y = Physics2D.Raycast(player.position, Vector2.left, Mathf.Infinity, _LayerWalls).distance + Physics2D.Raycast(player.position, Vector2.right, Mathf.Infinity, _LayerWalls).distance + player.localScale.y;
-
-        return new Vector2(x, y);
-    }
-    #endregion
+    
 }
