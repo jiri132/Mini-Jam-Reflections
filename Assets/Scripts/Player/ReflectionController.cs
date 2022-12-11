@@ -27,14 +27,12 @@ public class ReflectionController : Player
 
         //get  the ratio between movement
         _fieldRatio = _ownField / _playerField;
-
-        this.transform.position = TranslatePlayerPosition(_player.transform);
     }
 
 
     private void Update()
     {
-        
+        this.transform.position = TranslatePlayerPosition(_player.transform);
     }
     
     public Vector2 TranslatePlayerPosition(Transform player)
@@ -43,8 +41,8 @@ public class ReflectionController : Player
         Vector2 newPosition = _player.transform.position;
 
         //add the movement ratio to the position
-        if (reflectionType == ReflectionType.Horizontal) { newPosition.x = this.transform.position.x * _fieldRatio.x * -1;  }
-        else { newPosition.y = this.transform.position.y * _fieldRatio.y * -1; }
+        if (reflectionType == ReflectionType.Horizontal) { newPosition.x = player.position.x * _fieldRatio.x * -1;  }
+        else { newPosition.y = player.position.y * _fieldRatio.y * -1; }
 
         return newPosition;
     }
