@@ -14,7 +14,7 @@ public class ReflectionController : Player
     [SerializeField] private LayerMask _LayerWalls;
 
     
-
+    [Header("REFLECTION SIDE")]
     public ReflectionType reflectionType;
 
     private void Awake() => _player = FindObjectOfType<PlayerController>();
