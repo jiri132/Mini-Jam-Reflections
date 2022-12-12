@@ -7,10 +7,6 @@ public class PlayerController : Player
 {
     private enum movementType { Undefined,Keyboard, Controller }
 
-
-    [Header("ANIMATION")]
-    public Animator _animator;
-
     [Header("MOVEMENT TYPE")]
     [SerializeField] private movementType _movementType = movementType.Undefined;
     [SerializeField] public MovementManager movementManager;
@@ -55,6 +51,7 @@ public class PlayerController : Player
         if (collision.CompareTag("VOID"))
         {
             _animator.Play(PlayerAnimator.Deathkey);
+            GameManager.Instance.PlayDeathSound();
         }
     }
 

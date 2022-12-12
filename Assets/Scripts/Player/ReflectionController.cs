@@ -18,15 +18,23 @@ public class ReflectionController : Player
 
     private void Start()
     {
+        _animator = GetComponent<Animator>();
         this.transform.position = TranslatePlayerPosition(_player.transform);
 
         base.GetReflectionMirrors(this);
     }
 
-
     private void Update()
     {
         this.transform.position = TranslatePlayerPosition(_player.transform);
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("VOID"))
+        {
+            _animator.Play(PlayerAnimator.Deathkey);
+            GameManager.Instance.PlayDeathSound();
+        }
     }
 
     public Vector2 TranslatePlayerPosition(Transform player)
@@ -37,7 +45,7 @@ public class ReflectionController : Player
         //get the correct x and y base of reflection type
         if (reflectionType == ReflectionType.Horizontal)
         {
-            TranslatedPosition.x = _player.PlayingField.x + Ratio().x * PlayingField.x - 0.5f;
+            TranslatedPosition.x = _player.PlayingField.x + Ratio().x * PlayingField.x;
             TranslatedPosition.y = player.position.y;
         }
         else if (reflectionType == ReflectionType.Vertical)

@@ -35,19 +35,23 @@ public abstract class Player : MonoBehaviour
         return new Vector2(x, y);
     }
 
-
+    [Header("ANIMATION")]
+    public Animator _animator;
 
     #region Spawning
     private Vector2[] Directions = new Vector2[4] { new Vector2(0, 1), new Vector2(1, 0), new Vector2(0, -1), new Vector2(-1, 0) };
 
     public void GetReflectionMirrors(Player player)
     {
+        if (player.GetComponent<SpriteRenderer>().color.r < 0.05f) { return; }
+
         foreach (Vector2 dir in Directions)
         {
-            Debug.Log(dir);
-            Debug.DrawRay(this.transform.position, dir * 100, Color.cyan, 3);
-            Mirror mirror = Physics2D.Raycast(this.transform.position, dir, Mathf.Infinity, collisionMask).transform.GetComponent<Mirror>();
-            if (mirror == null || player.SpawningMirror == mirror) { continue; }
+            GameObject wall = Physics2D.Raycast(this.transform.position, dir, Mathf.Infinity, collisionMask).transform.gameObject; 
+            if (!wall.CompareTag("Mirror")) { continue; }
+            Mirror mirror = wall.GetComponent<Mirror>();
+
+            if (player.SpawningMirror == mirror) { continue; }
             
             //GameManager.Instance._castedMirrors.Add(mirror);
             Vector2 mirrorPos = mirror.transform.position + (Vector3)dir;
@@ -66,7 +70,7 @@ public abstract class Player : MonoBehaviour
             }
 
             Vector2 playingField = new Vector2(x, y);
-            GameManager.Instance.Fields.Add(playingField);
+            Debug.Log(playingField);
 
             //setting all the reflections values
             ReflectionController rc = Instantiate(GameManager.Instance._reflectionPrefab,Vector2.zero,Quaternion.identity).GetComponent<ReflectionController>();
